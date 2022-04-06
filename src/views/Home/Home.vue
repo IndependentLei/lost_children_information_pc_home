@@ -32,13 +32,13 @@
               多一份守护 少一次意外
             </span>
             <br>
-            <el-button size="mini" round>点击进入</el-button>
+            <el-button size="mini" round @click="$router.push({name:'goHomeDream'})">点击进入</el-button>
           </el-card>
           <el-card style="margin-top: 20px;cursor: pointer"
                    shadow="hover"
                    v-for="childrenInfo in childrenList"
                    :key="childrenInfo.id"
-                   @click.native="infoChildrenInfo(childrenInfo.id)" >
+                   @click.native="infoChildrenInfo(childrenInfo)" >
             <div style="display: flex">
               <img :src="childrenInfo.pic" style="width: 40%;height: 50%"/>
               <div style="text-align: left;line-height: 33px;margin-left: 20px">
@@ -80,17 +80,16 @@ export default {
       ],
       srcList:[],
       childrenList:[
-        {id:'1',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-8-9',age:1,lostLocation:'淮安市淮阴区',contactPhone:'1995239367'},
-        {id:'2',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-10-9',age:2,lostLocation:'淮安市淮阴区111111111111111111111111111111',contactPhone:'1995239367'},
-        {id:'3',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-8-23',age:34,lostLocation:'淮安市淮阴区',contactPhone:'1995239367'},
-        {id:'4',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-12-12',age:22,lostLocation:'淮安市淮阴区',contactPhone:'1995239367'}
+        {id:'1',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-8-9',age:1,lostLocation:'淮安市淮阴区',contactPhone:'1995239367',sex:'0',cardId:'320804199810261910'},
+        {id:'2',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-10-9',age:2,lostLocation:'淮安市淮阴区111111111111111111111111111111',contactPhone:'1995239367',sex:'1'},
+        {id:'3',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-8-23',age:34,lostLocation:'淮安市淮阴区',contactPhone:'1995239367',sex:'2'},
+        {id:'4',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-12-12',age:22,lostLocation:'淮安市淮阴区',contactPhone:'1995239367',sex:'0'}
       ]
     }
   },
   methods:{
-    infoChildrenInfo(id){
-      console.log(111)
-      this.$router.push({name:'childrenInfo',params:{childrenId:id}})
+    infoChildrenInfo(childrenInfo){
+      this.$router.push({name:'childrenInfo',params:{childrenInfo:childrenInfo}})
     }
   }
 }
