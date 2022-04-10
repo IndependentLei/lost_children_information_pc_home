@@ -49,6 +49,7 @@
     </div>
     <div class="comment">
       <comment
+        :avatar="userInfo !== null ? userInfo.avatarImg:false"
         commentWidth="100%"
         placeholder="想说点什么呢"
         :commentNum="commentList.length"
