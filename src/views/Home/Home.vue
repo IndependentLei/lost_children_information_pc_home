@@ -5,15 +5,14 @@
         <el-image
           :src="item.pic"
           fit="fill"
-          :preview-src-list="srcList"
           style="width: 880px;height: 400px"/>
       </el-carousel-item>
     </el-carousel>
     <el-row :gutter="20">
-      <el-col :span="16">
+      <el-col :span="14">
 
       </el-col>
-      <el-col :span="8">
+      <el-col :span="10">
         <div style="border-top: 2px solid #003580;margin-left: 40px">
           <p style="margin: 0">丢失儿童</p>
           <el-card shadow="hover" style="margin-top: 10px">
@@ -41,12 +40,12 @@
                    @click.native="infoChildrenInfo(childrenInfo)" >
             <div style="display: flex">
               <img :src="childrenInfo.pic" style="width: 40%;height: 50%"/>
-              <div style="text-align: left;line-height: 33px;margin-left: 20px">
-                <span>儿童姓名:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{childrenInfo.userName}}</span>
+              <div style="text-align: left;line-height: 33px;margin-left: 40px">
+                <span>儿童姓名:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{childrenInfo.childrenName}}</span>
                 <br>
                 <span>儿童年龄:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{childrenInfo.age}}</span>
                 <br>
-                <span>走失时间:</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>{{childrenInfo.lostTime}}</span>
+                <span>走失时间:</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>{{childrenInfo.lostTime | dateFormat}}</span>
                 <br>
                 <span :title="childrenInfo.lostLocation">
                   走失地点:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{childrenInfo.lostLocation.length > 6 ? childrenInfo.lostLocation.substr(0, 6).concat('...') : childrenInfo.lostLocation}}
@@ -67,30 +66,39 @@
 </template>
 
 <script>
+import {homeInfo} from '../../api/Home/Home'
 export default {
   name: "Home",
   data(){
     return{
-      picList:[
-        {id:'1',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg'},
-        {id:'2',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg'},
-        {id:'3',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg'},
-        {id:'4',pic:'https://file.7b114.xyz/blog_avater/2022/04/04/1649052266734189.jpg'},
-        {id:'5',pic:'https://file.7b114.xyz/blog_avater/2022/04/04/1649052266734189.jpg'}
-      ],
-      srcList:[],
-      childrenList:[
-        {id:'1',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-8-9',age:1,lostLocation:'淮安市淮阴区',contactPhone:'1995239367',sex:'0',cardId:'320804199810261910'},
-        {id:'2',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-10-9',age:2,lostLocation:'淮安市淮阴区111111111111111111111111111111',contactPhone:'1995239367',sex:'1'},
-        {id:'3',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-8-23',age:34,lostLocation:'淮安市淮阴区',contactPhone:'1995239367',sex:'2'},
-        {id:'4',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-12-12',age:22,lostLocation:'淮安市淮阴区',contactPhone:'1995239367',sex:'0'}
-      ]
+      loading:false,
+      picList:[],
+      childrenList:[]
     }
   },
   methods:{
     infoChildrenInfo(childrenInfo){
       this.$router.push({name:'childrenInfo',params:{childrenInfo:childrenInfo}})
     }
+  },
+  mounted() {
+    this.loading = this.$loading({ text: '加载数据' })
+    homeInfo().then(res=>{
+      console.log(res.data)
+      if (res.data.code === 200){
+        this.picList = res.data.data.slideshows
+        for (let i = 0; i < res.data.data.firstPic.length; i++) {
+          res.data.data.childrenInfos[i].pic = res.data.data.firstPic[i]
+        }
+        this.childrenList = res.data.data.childrenInfos
+      }else{
+        this.$message("获取数据失败,请联系管理员")
+      }
+
+    })
+    setTimeout(()=>{
+      this.loading.close()
+    },1500)
   }
 }
 </script>

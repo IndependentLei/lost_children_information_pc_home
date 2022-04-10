@@ -15,11 +15,11 @@
           </div>
         </div>
         <div class="childInfo">
-          <p>{{childrenInfo.cardId}}</p>
+          <p>{{childrenInfo.idCard}}</p>
           <table>
             <tbody>
             <tr>
-              <td>姓名:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{childrenInfo.userName}}</td>
+              <td>姓名:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{childrenInfo.childrenName}}</td>
             </tr>
             <tr>
               <td>性别:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{childrenInfo.sex === '0' ? '女' : childrenInfo.sex === '1' ? '男' : '未知'}}</td>
@@ -48,7 +48,14 @@
       </div>
     </div>
     <div class="comment">
-      <comment >
+      <comment
+        commentWidth="100%"
+        placeholder="想说点什么呢"
+        :commentNum="commentList.length"
+        :commentList="commentList"
+        label="评论者"
+        @doSend="doSend"
+        @doChidSend="doChidSend">
       </comment>
     </div>
   </div>
@@ -56,41 +63,93 @@
 </template>
 
 <script>
+import {getChildAttachById,getCommentById,sendFatherComment,sendSonComment} from '../../api/Childrens/Childrens'
+import {mapState} from 'vuex'
 import comment from 'bright-comment'
 export default {
   name: "ChildrenInfo",
   data(){
     return{
       childrenInfo:{},
-      picList:[
-        {id:'1',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg'},
-        {id:'2',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg'},
-        {id:'3',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg'},
-        {id:'4',pic:'https://file.7b114.xyz/blog_avater/2022/04/04/1649052266734189.jpg'},
-        {id:'5',pic:'https://file.7b114.xyz/blog_avater/2022/04/04/1649052266734189.jpg'}
-      ],
-      commentList:[
-        {id:'1',avatar:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userCode:'jdl'}
-      ],
-      showPic:this.$route.params.childrenInfo.pic
+      loading:false,
+      picList:[],
+      showPic:this.$route.params.childrenInfo.pic,
+      commentList:[]
     }
+  },
+  computed:{
+    ...mapState('User',['userInfo'])
   },
   methods:{
     changePic(pic){
       this.showPic = pic
     },
-    doSend(){
+    doSend(content){
+      if (content === undefined || content === "") {
+        this.$message.warning("评论内容不能为空");
+        return;
+      }
+      console.log(content)
+      let query = {
+        childrenInfoId:this.childrenInfo.childrenId,
+        commentContent:content
+      }
+      sendFatherComment(query).then(res=>{
+        if (res.data.code === 200){
+          this.$message.success(res.data.msg)
+          this.getComment(this.childrenInfo.childrenId)
+        }else{
+          this.$message.error(res.data.msg)
+        }
+      })
+    },
+    doChidSend(content,userId,fatherCommentId){
+      if (content === undefined || content === "") {
+        this.$message.warning("评论内容不能为空");
+        return;
+      }
+      console.log(content,userId,fatherCommentId)
+      let query = {
+        fatherCommentId : fatherCommentId,
+        replayId:userId,
+        replayContext:content
+      }
+      sendSonComment(query).then(res=>{
+        if (res.data.code === 200){
+          this.$message.success(res.data.msg)
+          this.getComment(this.childrenInfo.childrenId)
+        }else{
+          this.$message.error(res.data.msg)
+        }
+      })
 
     },
-    doChidSend(){
-
+    getComment(id){
+      getCommentById(id).then(res=>{
+        console.log(res.data);
+        if (res.data.code === 200){
+          this.commentList = res.data.data
+        }
+      })
     }
   },
   components:{
     comment
   },
   mounted() {
+    this.loading = this.$loading({text:'加载信息'})
     this.childrenInfo = this.$route.params.childrenInfo
+    console.log(this.childrenInfo)
+    getChildAttachById(this.childrenInfo.childrenId).then(res=>{
+      if (res.data.code === 200){
+        this.picList = res.data.data
+      }
+    })
+    this.getComment(this.childrenInfo.childrenId)
+    setTimeout(()=>{
+      this.loading.close()
+    },1000)
+
   }
 }
 </script>
@@ -110,7 +169,7 @@ export default {
 }
 .childrenInfo .info .img{
   float: left;
-  width: 50%;
+  width: 40%;
 }
 .childrenInfo .info .img .imgOne{
   width: 14vw;
@@ -147,7 +206,6 @@ export default {
   font-weight: normal;
   font-size: medium;
   font-style: normal;
-  color: -internal-quirk-inherit;
   text-align: start;
   border-spacing: 2px;
   border-color: grey;

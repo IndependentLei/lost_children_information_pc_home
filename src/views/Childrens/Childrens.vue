@@ -3,16 +3,16 @@
     <p>丢失儿童</p>
     <el-form :inline="true" :model="formInline" class="demo-form-inline" style="display:flex;">
       <el-form-item style="margin-left: 10px">
-        <el-input v-model="formInline.childrenName" placeholder="姓名"></el-input>
+        <el-input v-model="formInline.childrenName" clearable placeholder="姓名"></el-input>
       </el-form-item>
       <el-form-item >
-        <el-input v-model="formInline.age" placeholder="年龄"></el-input>
+        <el-input v-model="formInline.age" clearable placeholder="年龄"></el-input>
       </el-form-item>
       <el-form-item >
-        <el-input v-model="formInline.lostLocation" placeholder="丢失地点"></el-input>
+        <el-input v-model="formInline.lostLocation" clearable placeholder="丢失地点"></el-input>
       </el-form-item>
       <el-form-item >
-        <el-select v-model="formInline.sex" placeholder="性别">
+        <el-select v-model="formInline.sex" placeholder="性别" clearable>
           <el-option label="女" value="0"></el-option>
           <el-option label="男" value="1"></el-option>
           <el-option label="未知" value="2"></el-option>
@@ -35,11 +35,16 @@
       </el-form-item>
     </el-form>
     <div class="childrensInfo">
-      <el-card v-for="item in childrenList" :key="item.id" shadow="hover" style="flex: none ;margin-left: 37px;margin-top: 20px">
+      <el-card v-for="item in childrenList"
+               :key="item.id"
+               shadow="always"
+
+               @click.native="infoChildrenInfo(item)"
+               style="flex: none ;margin-left: 37px;margin-top: 20px;cursor: pointer">
         <img :src="item.pic" alt="出错了" style="width: 120px;height: 120px;padding: 0">
         <br>
         <div style="text-align: left;margin-left: 20px">
-          <span>姓名:&nbsp;&nbsp;&nbsp;{{item.userName}}</span>
+          <span>姓名:&nbsp;&nbsp;&nbsp;{{item.childrenName}}</span>
           <br>
           <span>年龄:&nbsp;&nbsp;&nbsp;{{item.age}}</span>
         </div>
@@ -59,6 +64,7 @@
 </template>
 
 <script>
+import {selectChildByPage} from '../../api/Childrens/Childrens'
 export default {
   name: "Childrens",
   data(){
@@ -97,34 +103,53 @@ export default {
         sex:'',
       },
       timeSelect:[],
-      childrenList:[
-        {id:'1',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-8-9',age:1,lostLocation:'淮安市淮阴区',contactPhone:'1995239367'},
-        {id:'2',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-10-9',age:2,lostLocation:'淮安市淮阴区111111111111111111111111111111',contactPhone:'1995239367'},
-        {id:'3',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-8-23',age:34,lostLocation:'淮安市淮阴区',contactPhone:'1995239367'},
-        {id:'4',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-12-12',age:22,lostLocation:'淮安市淮阴区',contactPhone:'1995239367'},
-        {id:'5',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-12-12',age:22,lostLocation:'淮安市淮阴区',contactPhone:'1995239367'},
-        {id:'6',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-12-12',age:22,lostLocation:'淮安市淮阴区',contactPhone:'1995239367'},
-        {id:'7',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-12-12',age:22,lostLocation:'淮安市淮阴区',contactPhone:'1995239367'},
-        {id:'8',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-12-12',age:22,lostLocation:'淮安市淮阴区',contactPhone:'1995239367'},
-        {id:'9',pic:'https://file.7b114.xyz/blog_avater/2021/11/17/jdl.jpg',userName:'小李',lostTime:'2021-12-12',age:22,lostLocation:'淮安市淮阴区',contactPhone:'1995239367'}
-      ],
+      childrenList:[],
       page:{
         current:'',
         size:'',
         total:''
-      }
+      },
+      loading:false
     }
   },
   methods:{
-    handleCurrentChange(){
-
+    infoChildrenInfo(childrenInfo){
+      this.$router.push({name:'childrenInfo',params:{childrenInfo:childrenInfo}})
+    },
+    handleCurrentChange(val){
+      this.pageUtil(val,this.page.size)
     },
     handleSizeChange(val){
-
+      this.pageUtil(1,val)
     },
     onSubmit(){
+      this.pageUtil(1,this.page.size)
+    },
+    pageUtil(current,size){
+      this.loading = this.$loading({text:'加载数据...'})
+      let query = {
+        startPage : current,
+        pageSize : size,
+        ...this.formInline,
+        startTime:this.timeSelect === null ? '' : this.timeSelect[0],
+        endTime:this.timeSelect === null ? '' : this.timeSelect[1]
+      }
+      selectChildByPage(query).then(res=>{
+        if (res.data.code === 200){
+          this.page.current = res.data.data.current
+          this.page.size = res.data.data.size
+          this.page.total = res.data.data.total
+          this.childrenList = res.data.data.list
+        }
+      })
 
+      setTimeout(()=>{
+        this.loading.close()
+      },1200)
     }
+  },
+  mounted() {
+    this.pageUtil(1,15)
   }
 }
 </script>

@@ -70,7 +70,17 @@ export default new Router({
             Auth:false
           }
         },
+        {
+          path:'/login',
+          name:'login',
+          component: () => import('@/views/Login/Login'),
+          meta:{
+            Auth:false
+          }
+        },
       ]
     }
   ]
 })
+
+
