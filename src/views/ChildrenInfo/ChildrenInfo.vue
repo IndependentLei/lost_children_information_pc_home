@@ -49,10 +49,9 @@
     </div>
     <div class="comment">
       <comment
-        :avatar="userInfo !== null ? userInfo.avatarImg:false"
         commentWidth="100%"
         placeholder="想说点什么呢"
-        :commentNum="commentList.length"
+        :commentNum="commentNum"
         :commentList="commentList"
         label="评论者"
         @doSend="doSend"
@@ -67,6 +66,7 @@
 import {getChildAttachById,getCommentById,sendFatherComment,sendSonComment} from '../../api/Childrens/Childrens'
 import {mapState} from 'vuex'
 import comment from 'bright-comment'
+import {getUserByUserCode} from '../../api/User/User'
 export default {
   name: "ChildrenInfo",
   data(){
@@ -75,7 +75,8 @@ export default {
       loading:false,
       picList:[],
       showPic:this.$route.params.childrenInfo.pic,
-      commentList:[]
+      commentList:[],
+      commentNum:0
     }
   },
   computed:{
@@ -86,11 +87,18 @@ export default {
       this.showPic = pic
     },
     doSend(content){
+      if (this.userInfo === null){
+        this.$message.warning("请先登录")
+        return;
+      }
+      if(this.userInfo.state === '1'){
+        this.$message.warning("您已被禁言")
+        return;
+      }
       if (content === undefined || content === "") {
         this.$message.warning("评论内容不能为空");
         return;
       }
-      console.log(content)
       let query = {
         childrenInfoId:this.childrenInfo.childrenId,
         commentContent:content
@@ -105,6 +113,16 @@ export default {
       })
     },
     doChidSend(content,userId,fatherCommentId){
+      if (this.userInfo === null){
+        this.$message.warning("请先登录")
+        return;
+      }
+
+      if(this.userInfo.state === '1'){
+        this.$message.warning("您已被禁言")
+        return;
+      }
+
       if (content === undefined || content === "") {
         this.$message.warning("评论内容不能为空");
         return;
@@ -127,9 +145,14 @@ export default {
     },
     getComment(id){
       getCommentById(id).then(res=>{
-        console.log(res.data);
-        if (res.data.code === 200){
-          this.commentList = res.data.data
+        if(res.data.code === 200){
+          if (res.data.data === undefined){
+            this.commentNum = 0
+            this.commentList = []
+          }else {
+            this.commentNum = res.data.data.length
+            this.commentList = res.data.data
+          }
         }
       })
     }
@@ -140,7 +163,6 @@ export default {
   mounted() {
     this.loading = this.$loading({text:'加载信息'})
     this.childrenInfo = this.$route.params.childrenInfo
-    console.log(this.childrenInfo)
     getChildAttachById(this.childrenInfo.childrenId).then(res=>{
       if (res.data.code === 200){
         this.picList = res.data.data

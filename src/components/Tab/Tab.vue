@@ -25,7 +25,7 @@
           <img :src="userInfo.avatarImg" width="30px" height="30px" style="cursor:pointer;margin-top: 15px">
         </div>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="personCenter">个人中心</el-dropdown-item>
+<!--          <el-dropdown-item command="personCenter">个人中心</el-dropdown-item>-->
           <el-dropdown-item command="changePassword">修改密码</el-dropdown-item>
           <el-dropdown-item command="logOut">退出登录</el-dropdown-item>
         </el-dropdown-menu>
@@ -37,16 +37,16 @@
       :show-close="false"
       :visible.sync="dialog.dialogVisible"
       width="30%">
-      <el-form label-width="80px" :model="loginForm" :rules="rule" ref="form">
+      <el-form label-width="80px" :model="loginForm" :rules="rule" ref="loginform">
         <el-form-item label="账号" prop="userCode" >
-          <el-input v-model="loginForm.userCode" clearable prefix-icon="" placeholder="账号"></el-input>
+          <el-input type="text" v-model="loginForm.userCode" clearable prefix-icon="" placeholder="账号"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="userPwd" >
-          <el-input v-model="loginForm.userPwd" clearable placeholder="密码"></el-input>
+          <el-input type="password" v-model="loginForm.userPwd" clearable placeholder="密码"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" :loading="loginForm.loading" @click="submitForm('form')">登录</el-button>
-          <el-button @click="resetForm('form')">重置</el-button>&nbsp;&nbsp;&nbsp;
+          <el-button type="primary" :loading="loginForm.loading" @click="submitForm('loginform')">登录</el-button>
+          <el-button @click="resetForm('loginform')">重置</el-button>&nbsp;&nbsp;&nbsp;
           <el-link type="primary" @click="dialog1.dialogVisible=true;dialog.dialogVisible=false;">注册</el-link>
         </el-form-item>
       </el-form>
@@ -56,7 +56,7 @@
       :show-close="false"
       :visible.sync="dialog1.dialogVisible"
       width="30%">
-      <el-form label-width="80px" :model="registerForm" :rules="rule1" ref="form">
+      <el-form label-width="80px" :model="registerForm" :rules="rule1" ref="registerForm">
         <el-form-item label="头像" prop="avatarImg">
           <el-upload
             class="avatar-uploader"
@@ -72,10 +72,10 @@
           <el-input v-model="registerForm.userCode" clearable placeholder="账号"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="userPwd">
-          <el-input v-model="registerForm.userPwd" clearable placeholder="密码"></el-input>
+          <el-input type="password" v-model="registerForm.userPwd" clearable placeholder="密码"></el-input>
         </el-form-item>
         <el-form-item label="重复密码" prop="repeatPwd">
-          <el-input v-model="registerForm.repeatPwd" clearable placeholder="重复密码"></el-input>
+          <el-input type="password" v-model="registerForm.repeatPwd" clearable placeholder="重复密码"></el-input>
         </el-form-item>
         <el-form-item label="年龄" prop="age" placeholder="年龄">
           <el-input v-model="registerForm.age" clearable></el-input>
@@ -86,11 +86,41 @@
           <el-radio v-model="registerForm.sex"  label="2" name="sex" >未知</el-radio>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="dialogRegister('form')">注册</el-button>
-          <el-button @click="registerReset('form')">重置</el-button>&nbsp;&nbsp;&nbsp;
+          <el-button type="primary" @click="dialogRegister('registerForm')">注册</el-button>
+          <el-button @click="registerReset('registerForm')">重置</el-button>&nbsp;&nbsp;&nbsp;
           <el-link type="primary" @click="dialog1.dialogVisible=false;dialog.dialogVisible=true;">去登陆</el-link>
         </el-form-item>
       </el-form>
+    </el-dialog>
+    <el-dialog title="修改密码"
+               :visible.sync="form1.dialogFormVisible"
+               append-to-body
+               close-on-click-modal
+               width="30%"
+               style="text-align: center">
+
+      <el-form :model="form1"
+               status-icon
+               :rules="rules2"
+               ref="changePassForm"
+               label-width="100px"
+               class="demo-ruleForm">
+
+        <el-form-item label="旧密码" prop="oldPassword">
+          <el-input type="password" v-model="form1.oldPassword" ></el-input>
+        </el-form-item>
+        <el-form-item label="新密码" prop="newPassword">
+          <el-input type="password" v-model="form1.newPassword" ></el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="checkPassword">
+          <el-input type="password" v-model="form1.checkPassword" ></el-input>
+        </el-form-item>
+      </el-form>
+
+      <div slot="footer" class="dialog-footer" style="text-align: center;padding-top: 0">
+        <el-button @click="exitChangePassword('changePassForm')">退出</el-button>
+        <el-button type="primary" @click="modifyPassword('changePassForm')">修改</el-button>
+      </div>
     </el-dialog>
   </div>
 
@@ -102,10 +132,42 @@ import {login,getUserByUserCode} from "../../api/Login/Login";
 import {logout} from "../../api/Login/logOut"
 import {setCookie,getCookie,removeCookie} from "../../utils/cookie";
 import {mapState,mapMutations} from 'vuex'
+import {changePwd} from '../../api/User/User'
 
 export default {
   name: "Tab",
   data(){
+    let validateNewPass = (rule , value , callback) =>{
+      if (value === ''){
+        callback(new Error("请输入旧密码"))
+      }else if(value.length < 6){
+        callback(new Error("密码不能小于6位"))
+      }else if(value.length > 16){
+        callback(new Error("密码不能超过16位"))
+      }else
+        callback()
+    }
+    let validatePass = (rule, value, callback) => {
+
+      if (value === '') {
+        callback(new Error('请输入密码'));
+      }
+      else if (value === this.form1.oldPassword){
+        callback("新密码和旧密码不能一样")
+      }
+      else {
+        callback();
+      }
+    };
+    let validatePass2 = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请再次输入密码'));
+      } else if (value !== this.form1.newPassword) {
+        callback(new Error('两次输入密码不一致!'));
+      } else {
+        callback();
+      }
+    };
     var validateAttach = (rule, value, callback) => {
       if (value === undefined){
         callback(new Error("上传图片不能为空"))
@@ -148,6 +210,23 @@ export default {
         sex:'0',
         avatarImg:''
       },
+      form1:{
+        dialogFormVisible:false,
+        oldPassword:'',
+        newPassword:'',
+        checkPassword:''
+      },
+      rules2:{
+        oldPassword: [
+          {required:true,validator: validateNewPass, trigger:'blur'}
+        ],
+        newPassword: [
+          {required:true,validator: validatePass, trigger: 'blur'}
+        ],
+        checkPassword: [
+          {required:true,validator: validatePass2, trigger: 'blur'}
+        ]
+      },
       rule1:{
         userCode:[
           {required:true,message:'请输入账号',trigger:'blur'},
@@ -187,13 +266,42 @@ export default {
     }
   },
   methods:{
+    exitChangePassword(formName){
+      this.$refs[formName].resetFields();
+      this.form1.dialogFormVisible = false
+    },
+    modifyPassword(formName){
+      this.$refs[formName].validate((valid) =>{
+        if(valid){
+          let query = {
+            oldPwd:this.form1.oldPassword,
+            userPwd:this.form1.newPassword
+          }
+          changePwd(query).then(res=>{
+            if(res.data.code === 200){
+              console.log(res.data)
+              // 退出dialog，重置表单
+              this.exitChangePassword("changePassForm")
+              // 删除认证
+              this.$message.success("修改成功，请重新登录")
+              this.logOut() // 退出登录
+            }else{
+              this.$message.error(res.data.msg)
+            }
+          })
+
+        }else {
+          return false
+        }
+      })
+    },
     logOut(){
       logout().then(res=>{
-        console.log(res.data)
         if(res.data.code === 200){
           localStorage.removeItem("userInfo")
           removeCookie("Authentication")
           this.$store.commit("User/CHANGELOGINFLAG",false)
+          this.$store.commit("User/SETUSERINFO",null)
           this.$message.success(res.data.msg)
         }else {
           this.$message.error(res.data.msg)
@@ -207,7 +315,7 @@ export default {
       if(command === 'logOut'){
         this.logOut()
       }else if(command === 'changePassword'){
-        this.dialogFormVisible = true
+        this.form1.dialogFormVisible = true
       }else{
         // 进入personCenter组件
         this.$router.push({name:'personCenter'})
@@ -245,10 +353,9 @@ export default {
           login(this.loginForm.userCode,this.loginForm.userPwd).then(res=>{
             if (res.data.code === 200 ){
               // 将token存入cookie，
-              setCookie("Authentication",res.data.Authentication)
+              setCookie(this.loginForm.userCode+"Authentication",res.data.Authentication)
               getUserByUserCode(this.loginForm.userCode).then(res=>{
                 if (res.data.code === 200){
-                  console.log(res.data)
                   this.$store.commit("User/SETUSERINFO",res.data.data)
                   this.$store.commit("User/CHANGELOGINFLAG",true)
                   localStorage.setItem('userInfo',JSON.stringify(res.data.data))
@@ -338,5 +445,10 @@ export default {
   width: 178px;
   height: 178px;
   display: block;
+}
+img{
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
 }
 </style>

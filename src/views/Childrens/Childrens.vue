@@ -51,7 +51,7 @@
       </el-card>
     </div>
     <el-pagination
-      style="margin: 20px"
+      style="margin-top: 30px;margin-bottom: 30px"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="page.current"
@@ -105,9 +105,9 @@ export default {
       timeSelect:[],
       childrenList:[],
       page:{
-        current:'',
-        size:'',
-        total:''
+        current:1,
+        size:5,
+        total:0
       },
       loading:false
     }
@@ -158,7 +158,7 @@ export default {
 
 .childrens{
   margin-top: 50px;
-  margin-left: 230px;
+  margin-left: 200px;
   background-color: white;
   width: 75%;
   height: auto;

@@ -81,3 +81,19 @@ export const selectChildByPage = (query)=>{
 }
 
 
+/**
+ * 新增儿童信息
+ * @param query
+ * @returns {AxiosPromise}
+ */
+export const addChildrenInfo = (query)=>{
+  return axios.request({
+    url: '/lostchildinfo/childrenInfo/add',
+    method:'post',
+    data:query
+  })
+}
+
+
+
+
