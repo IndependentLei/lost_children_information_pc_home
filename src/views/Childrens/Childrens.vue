@@ -12,6 +12,13 @@
         <el-input v-model="formInline.lostLocation" clearable placeholder="丢失地点"></el-input>
       </el-form-item>
       <el-form-item >
+        <el-select v-model="formInline.find" placeholder="是否找到" clearable>
+          <el-option label="未找到" value="0"></el-option>
+          <el-option label="已找到" value="1"></el-option>
+          <el-option label="全部" value=""></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item >
         <el-select v-model="formInline.sex" placeholder="性别" clearable>
           <el-option label="女" value="0"></el-option>
           <el-option label="男" value="1"></el-option>
@@ -97,6 +104,7 @@ export default {
         }]
       },
       formInline:{
+        find:'',
         childrenName:'',
         lostLocation:'',
         age:'',
