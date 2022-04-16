@@ -78,6 +78,14 @@ export default new Router({
             Auth:false
           }
         },
+        {
+          path:'/article',
+          name:'article',
+          component: () => import('@/views/Article/Article'),
+          meta:{
+            Auth:false
+          }
+        },
       ]
     }
   ]

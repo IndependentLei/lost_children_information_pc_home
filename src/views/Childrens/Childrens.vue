@@ -153,7 +153,7 @@ export default {
 
       setTimeout(()=>{
         this.loading.close()
-      },1200)
+      },1500)
     }
   },
   mounted() {
