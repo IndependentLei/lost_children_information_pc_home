@@ -74,6 +74,7 @@
         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
       </el-upload>
       <br>
+      <el-button v-if="active === 1" style="margin-top: 12px;" @click="next3()">上一步</el-button>
       <el-button :loading="buttonLoading" plain style="margin-top: 20px;text-align: center" @click="addChildInfo">提交儿童信息</el-button>
     </div>
   </div>
@@ -82,6 +83,7 @@
 <script>
 import {mapState} from 'vuex'
 import {addChildrenInfo} from '../../api/Childrens/Childrens'
+import {getRoleTypeByUserId} from "../../api/User/User";
 export default {
   name: "GoHomeDream",
   data(){
@@ -185,7 +187,17 @@ export default {
         this.$message.warning("请先登录")
         return;
       }
-      this.active++
+      getRoleTypeByUserId(this.userInfo.userId).then(res=>{
+        if(res.data.code === 200){
+          if(res.data.data.roleType === 3) {
+            this.active++
+          }else {
+            this.$message.warning("您还不是志愿者,不能帮助别人回家")
+          }
+        }else{
+          this.$message.error(res.data.msg)
+        }
+      })
     },
     next2(formName){
       console.log(this.childrenForm)
@@ -201,6 +213,10 @@ export default {
         this.active--
         this.$refs['ruleForm'].resetFields();
       }
+    },
+    next3(){
+      this.childrenInfoAttachList = null
+      this.active--
     }
   }
 }
