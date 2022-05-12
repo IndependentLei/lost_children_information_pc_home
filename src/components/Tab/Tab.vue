@@ -353,7 +353,7 @@ export default {
           login(this.loginForm.userCode,this.loginForm.userPwd).then(res=>{
             if (res.data.code === 200 ){
               // 将token存入cookie，
-              setCookie(this.loginForm.userCode+"Authentication",res.data.Authentication)
+              setCookie("Authentication",res.data.Authentication)
               getUserByUserCode(this.loginForm.userCode).then(res=>{
                 if (res.data.code === 200){
                   this.$store.commit("User/SETUSERINFO",res.data.data)

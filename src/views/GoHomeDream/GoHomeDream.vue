@@ -7,8 +7,8 @@
     </el-steps>
 
     <div>
-      <el-button v-if="active === 0" style="margin-top: 12px;" @click="next1">我要寻人</el-button>
-      <el-button v-if="active === 0" style="margin-top: 12px;" @click="next1">帮他回家</el-button>
+      <el-button v-if="active === 0" style="margin-top: 12px;" @click="next1(true)">我要寻人</el-button>
+      <el-button v-if="active === 0" style="margin-top: 12px;" @click="next1(false)">帮他回家</el-button>
     </div>
 
     <div class="childrenInfo" v-if="active === 1">
@@ -74,7 +74,7 @@
         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
       </el-upload>
       <br>
-      <el-button v-if="active === 1" style="margin-top: 12px;" @click="next3()">上一步</el-button>
+      <el-button v-if="active === 2" style="margin-top: 12px;" @click="next3()">上一步</el-button>
       <el-button :loading="buttonLoading" plain style="margin-top: 20px;text-align: center" @click="addChildInfo">提交儿童信息</el-button>
     </div>
   </div>
@@ -120,7 +120,8 @@ export default {
           { required:true, message: '请描述特征' ,trigger: 'blur' }
         ],
         contactPhone: [
-          { required:true,message:'请输入联系电话' ,trigger: 'blur' }
+          { required:true,message:'请输入联系电话' ,trigger: 'blur' },
+          { min:11,max:11,message: '请输入正确的电话',trigger: 'blur'}
         ],
         lostLocation: [
           { required:true,message:'请输入丢失地点' ,trigger: 'blur' }
@@ -151,6 +152,7 @@ export default {
       addChildrenInfo(query).then(res=>{
         if(res.data.code === 200){
           this.$message.success(res.data.msg)
+          this.$router.push({name:'home'})
         }else{
           this.$message.error(res.data.msg)
         }
@@ -180,24 +182,28 @@ export default {
       }
       return isJPG && isLt2M;
     },
-    next1(){
+    next1(flag){
       // TODO .... 校验是否登录
       console.log(this.userInfo)
       if (this.userInfo === null){
         this.$message.warning("请先登录")
         return;
       }
-      getRoleTypeByUserId(this.userInfo.userId).then(res=>{
-        if(res.data.code === 200){
-          if(res.data.data.roleType === 3) {
-            this.active++
-          }else {
-            this.$message.warning("您还不是志愿者,不能帮助别人回家")
+      if(!flag) {
+        getRoleTypeByUserId(this.userInfo.userId).then(res => {
+          if (res.data.code === 200) {
+            if (res.data.data.roleType === '3') {
+              this.active++
+            } else {
+              this.$message.warning("您还不是志愿者,不能帮助别人回家")
+            }
+          } else {
+            this.$message.error(res.data.msg)
           }
-        }else{
-          this.$message.error(res.data.msg)
-        }
-      })
+        })
+      }else{
+        this.active++
+      }
     },
     next2(formName){
       console.log(this.childrenForm)
@@ -215,7 +221,7 @@ export default {
       }
     },
     next3(){
-      this.childrenInfoAttachList = null
+      this.childrenInfoAttachList = []
       this.active--
     }
   }

@@ -5,7 +5,7 @@
         <el-image
           :src="item.pic"
           fit="fill"
-          style="width: 880px;height: 400px"/>
+          style="width: 750px;height: 400px"/>
       </el-carousel-item>
     </el-carousel>
     <div style="width: 80%;display:inline-block;">

@@ -100,6 +100,8 @@ export default {
         return;
       }
       let query = {
+        userId:this.userInfo.userId,
+        userCode:this.userInfo.userCode,
         childrenInfoId:this.childrenInfo.childrenId,
         commentContent:content
       }
@@ -129,10 +131,13 @@ export default {
       }
       console.log(content,userId,fatherCommentId)
       let query = {
+        userId:this.userInfo.userId,
+        userCode:this.userInfo.userCode,
         fatherCommentId : fatherCommentId,
         replayId:userId,
         replayContext:content
       }
+      console.log(query)
       sendSonComment(query).then(res=>{
         if (res.data.code === 200){
           this.$message.success(res.data.msg)
