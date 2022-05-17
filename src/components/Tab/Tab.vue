@@ -25,8 +25,10 @@
           <img :src="userInfo.avatarImg" width="30px" height="30px" style="cursor:pointer;margin-top: 15px">
         </div>
         <el-dropdown-menu slot="dropdown">
-<!--          <el-dropdown-item command="personCenter">个人中心</el-dropdown-item>-->
+
+          <el-dropdown-item command="personCenter">个人中心</el-dropdown-item>
           <el-dropdown-item command="changePassword">修改密码</el-dropdown-item>
+          <el-dropdown-item command="message">评论消息</el-dropdown-item>
           <el-dropdown-item command="logOut">退出登录</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -302,6 +304,7 @@ export default {
           removeCookie("Authentication")
           this.$store.commit("User/CHANGELOGINFLAG",false)
           this.$store.commit("User/SETUSERINFO",null)
+          this.$router.push({name:'home'})
           this.$message.success(res.data.msg)
         }else {
           this.$message.error(res.data.msg)
@@ -316,19 +319,11 @@ export default {
         this.logOut()
       }else if(command === 'changePassword'){
         this.form1.dialogFormVisible = true
-      }else{
+      }else if(command === 'personCenter'){
         // 进入personCenter组件
         this.$router.push({name:'personCenter'})
-        let tagList = {
-          id:9999,
-          path: this.$route.path,
-          name:'personCenter',
-          label:'个人中心',
-          icon:'user-solid',
-          url: this.$route.fullPath
-        }
-        this.$store.commit('tags/ACTIVEMENU',tagList)
-        this.$store.dispatch('tags/inTagsList',tagList)
+      }else {
+        // TODO... 消息界面
       }
     },
     handleAvatarSuccess(res){

@@ -86,6 +86,14 @@ export default new Router({
             Auth:false
           }
         },
+        {
+          path:'/personCenter',
+          name:'personCenter',
+          component: () => import('@/views/PersonCenter/PersonCenter'),
+          meta:{
+            Auth:false
+          }
+        },
       ]
     }
   ]

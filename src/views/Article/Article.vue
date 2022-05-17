@@ -1,7 +1,7 @@
 <template>
   <div class="article">
     <h2 class="title">{{articleInfo.title}}</h2>
-    <img :src="articleInfo.picUrl" :alt="articleInfo.title" width="200" height="100">
+<!--    <img :src="articleInfo.picUrl" :alt="articleInfo.title" width="200" height="100">-->
     <div class="articleContent" >
       <div class="contentStyle">{{articleInfo.content}}</div>
     </div>

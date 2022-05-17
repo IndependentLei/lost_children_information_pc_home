@@ -53,3 +53,17 @@ export const exitRoleByUserId = (query)=>{
 }
 
 
+/**
+ * 编辑用户信息
+ * @param query
+ * @returns {*}
+ */
+export const exitUserInfo = (query)=>{
+  return axios.request({
+    url: '/lostchildinfo/user/update',
+    method:'post',
+    data:query
+  })
+}
+
+
