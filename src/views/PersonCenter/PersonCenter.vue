@@ -72,7 +72,7 @@
 
 <script>
 import {getCookie} from "../../utils/cookie";
-import {exitUserInfo} from '../../api/User/user'
+import {exitUserInfo} from '../../api/User/User'
 import {Message} from "element-ui";
 import {delChildInfo, selectChildByPage, updateChildInfo} from "../../api/Childrens/Childrens";
 export default {

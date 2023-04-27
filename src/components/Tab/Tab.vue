@@ -28,7 +28,6 @@
 
           <el-dropdown-item command="personCenter">个人中心</el-dropdown-item>
           <el-dropdown-item command="changePassword">修改密码</el-dropdown-item>
-          <el-dropdown-item command="message">评论消息</el-dropdown-item>
           <el-dropdown-item command="logOut">退出登录</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
